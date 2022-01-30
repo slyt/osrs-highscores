@@ -8,4 +8,5 @@ temp/
 
 # ignore IDE and environment files
 venv/
+env/
 .idea/
