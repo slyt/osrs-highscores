@@ -9,6 +9,7 @@
 import pandas as pd
 from osrs_highscores import Highscores
 from osrs_highscores import Rankings
+import helpers # helper functions
 
 def main():
     use_pickle = True
@@ -62,7 +63,6 @@ def main():
 
     else:
         print("Using pickle file.")
-
 
 
 xp_level_table = [0,  # lvl 1
