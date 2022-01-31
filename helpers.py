@@ -1,6 +1,6 @@
 # helper functions
 
-from email.mime import base
+import math
 
 
 base_url = "https://secure.runescape.com/m=hiscore_oldschool/overall"
@@ -58,11 +58,11 @@ def page_number_to_rank_range(page_number=1):
     return (first_rank_on_page, last_rank_on_page)
 
 def rank_to_page_number(rank):
-    # 1 = page 1
-    # 25 = page 1
-    # 26 = page 2
-    # 50 = page 2
-    page_number = rank % 25 # 25 ranks per page
+    if rank <= 0 or rank > 2_000_000:
+        print("Error: Highscores only rank from 1 to 2,000,000")
+        return -1
+
+    page_number = math.ceil(rank / 25) # 25 ranks per page
     return page_number
 
 

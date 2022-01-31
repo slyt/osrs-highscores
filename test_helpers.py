@@ -1,9 +1,14 @@
-# Test functions
-
+# Test helper functions
 import helpers
 
+# Generate the URL for the specific skill and page
 helpers.request_page(skill='DeFENCE', page=1)
 
+# TODO: Test rank_to_page_number()
+ranks = [1, 2, 25, 26, 50, 51, 2_000_000, 1_999_999, 2_000_001, 9_999_999_999, 0, -1, -2_000_001]
+for rank in ranks:
+    page_number = helpers.rank_to_page_number(rank)
+    print("Rank {} is on page {}".format(rank, page_number))
 
 
 # Test helpers.page_number_to_rank_range
