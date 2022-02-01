@@ -6,6 +6,7 @@ cycler==0.11.0
 fonttools==4.29.0
 idna==2.8
 kiwisolver==1.3.2
+lxml==4.7.1
 matplotlib==3.5.1
 numpy==1.21.5
 osrs-highscores==0.6.1

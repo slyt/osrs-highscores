@@ -115,3 +115,10 @@ Non-skill highscores are stored where `category_type=1`. For example, Clue Scrol
 | 57 | Wintertodt                       |
 | 58 | Zalcano                          |
 | 59 | Zulrah                           |
+
+## Runtime analysis
+For a single skill, if we request one page (25 skills) per second, it will take 80,000 seconds ~= 1,333.33 minutes ~= 22.22 hours ~= 0.92 days.
+
+So for 23 skills + overall highscores, it will take about 24 days ~= almost a month to scrape the entire skills highscores.
+
+This can be sped up via making parallel requests and increasing the request speed. Also, instead of scraping the entire population of 2 Million, we can randomly sample a subset of the population.

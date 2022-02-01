@@ -1,4 +1,4 @@
-# Test the sampler functionality
+# Test the sampler functionality that will be used to randomly sample (without replaceent) skill pages
 
 import random         # used to sample data
 import seaborn as sns # used to visualize result
@@ -7,8 +7,6 @@ from timeit import default_timer as timer # Used to measure sampling performance
 # We want to sample the entire population randomly without replacement
 # so the samples_to_take == the populatino size
 samples_to_take = 80_000 # There are 80_000 pages to query per skill
-
-
 start = timer()
 #print("population_size: {}".format(population_size))
 samples = random.sample(range(1,samples_to_take+1), samples_to_take)

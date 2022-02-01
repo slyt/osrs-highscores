@@ -1,6 +1,8 @@
 # helper functions
 
 import math
+import requests
+import pandas as pd
 
 
 base_url = "https://secure.runescape.com/m=hiscore_oldschool/overall"
@@ -37,10 +39,11 @@ def request_page(skill='overall', page=1):
     skill_index = default_skills.get(skill.lower(), -1)
     if skill_index == -1:
         print("Error, invalid skill name supplied!")
-    print("Requesting skill {} (skill_index {}) page {}".format(skill, skill_index, page))
+    #print("Requesting skill {} (skill_index {}) page {}".format(skill, skill_index, page))
 
     request_url = base_url + '?table=' + str(skill_index) + '&' + 'page=' + str(page)
-    print('request_url: ', request_url)
+    #print('request_url: ', request_url)
+    return request_url
 
 def page_number_to_rank_range(page_number=1):
     # 1 = (1,25) 25-1 = 24
@@ -64,6 +67,23 @@ def rank_to_page_number(rank):
 
     page_number = math.ceil(rank / 25) # 25 ranks per page
     return page_number
+
+def get_page_as_df(skill, page_number):
+    request_url = request_page(skill=skill, page=page_number)
+    response = requests.get(request_url)
+    if response:
+        #print(response.text)
+        df_list = pd.read_html(response.text, skiprows={0,0}) # For some reason row 0 was all NA, so need to skip
+        df = df_list[0]
+        df.index += 1 # 1 index instead of 0 to match higscore indexing
+        df.columns = ['Rank', 'Name', 'Level', 'XP']
+        #print(df)
+        #print(df.dtypes)
+        return df
+
+    else:
+        print('Error: response status code {} for url {}'.format(response.status_code, request_url))
+
 
 
 
