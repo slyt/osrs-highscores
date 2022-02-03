@@ -1,3 +1,6 @@
+# Not fully implemented, use merge_pickles_dict.py instead
+# as it is more efficient
+
 from operator import index
 import pandas as pd
 import glob

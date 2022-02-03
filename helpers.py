@@ -89,12 +89,12 @@ def get_page_as_df(skill, page_number):
 
 
 
-def create_sample_list(samples_to_take):
+def create_sample_list(samples_to_take, population_size):
     ''' returns a list of random samples
 
     This returned list can be iterated over to provide random and unique samples
     '''
     #samples_to_take = 80_000 # There are 80_000 pages to query per skill
     
-    samples = random.sample(range(1,samples_to_take+1), samples_to_take)
+    samples = random.sample(range(1,population_size+1), samples_to_take)
     return samples

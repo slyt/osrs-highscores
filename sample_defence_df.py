@@ -6,7 +6,7 @@ import time
 import pandas as pd
 import pickle
 
-pickle_directory = "defence_pickles/"
+pickle_directory = "defence_pickles_df/"
 skill = "defence"
 
 sample_list = helpers.create_sample_list(3)

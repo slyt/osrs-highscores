@@ -53,11 +53,11 @@ def main():
             print(
                 "{skill_name}: {rank_xp} xp (lvl {rank_level}) for rank {rank}. {username}'s current xp: {user_current_xp} (lvl {user_level}). XP difference to rank {rank}: {xp_difference_to_rank}".format(
                     skill_name=skill_name,
-                    rank_xp = add_commas(int(rank_xp)),
+                    rank_xp = helpers.add_commas(int(rank_xp)),
                     rank_level=get_level(rank_xp),
                     rank=rank,
                     username=username,
-                    user_current_xp=add_commas(int(user_current_xp)),
+                    user_current_xp=helpers.add_commas(int(user_current_xp)),
                     user_level=get_level(user_current_xp),
                     xp_difference_to_rank=(xp_difference_to_rank)))
         

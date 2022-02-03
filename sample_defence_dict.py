@@ -11,14 +11,15 @@ import random
 pickle_directory = "defence_pickles_dict/"
 skill = "defence"
 
-sample_list = helpers.create_sample_list(30)
+number_of_pages_to_sample = 30
+population_size = 80_000 # There are 80,000 pages on the highscores for each skill
+sample_list = helpers.create_sample_list(number_of_pages_to_sample, population_size)
 list_of_dicts = []
 
 # Since 1 page of data is about 1KB, but block size on disk is 4KB,
 # we can increase disk utilzation by saving pages in batches
 batch = []
 max_batch_size = 10 
-
 
 for idx, page_number in enumerate(sample_list):
     page_df = helpers.get_page_as_df(skill=skill, page_number=page_number)
@@ -37,7 +38,7 @@ for idx, page_number in enumerate(sample_list):
         list_of_dicts = []
         batch = []
     sleep_duration = random.uniform(1, 3) # Sleep for slightly random amount of time
-    print("page_number={} idx={}... now sleeping for {}s".format(page_number, idx, sleep_duration))
+    print("idx={} page_number={} ... now sleeping for {}s".format(idx, page_number, sleep_duration))
     time.sleep(sleep_duration) # Throttle requests to API (should probably do randomly)
 
 # Write out the final batch incase it wasn't a multiple of max_batch_size
