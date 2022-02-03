@@ -7,7 +7,9 @@ import matplotlib.pyplot as plt
 import matplotlib
 from pyparsing import col
 
-list_of_files = glob.glob("defence_pickles_dict/*")
+skill = 'agility'
+directory_path = skill + "_pickles_dict/*"
+list_of_files = glob.glob(directory_path)
 print(list_of_files)
 
 list_of_dicts = []

@@ -8,10 +8,11 @@ import pandas as pd
 import pickle
 import random
 
-pickle_directory = "defence_pickles_dict/"
-skill = "defence"
+skill = "agility"
+pickle_directory = skill + "_pickles_dict/"
 
-number_of_pages_to_sample = 30
+
+number_of_pages_to_sample = 300
 population_size = 80_000 # There are 80,000 pages on the highscores for each skill
 sample_list = helpers.create_sample_list(number_of_pages_to_sample, population_size)
 list_of_dicts = []
