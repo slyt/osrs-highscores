@@ -1,9 +1,10 @@
 # TODO:
-# Get player name and experience (xp) in every skill from OSRS
-# Parse xp into pandas dataframe
-# Run k-means clustering on xp and plot the results. 
-# Correlate size of the points in the cluster with the number of elements in the cluster. 
-#   Or rather, points that are far from cluster centers are larger. This will help to detect unique accounts.
+# - [X] Implement random sampler for each page of highscores
+# - [x] Parse XP tables into pandas dataframe
+# - [ ] Get player name and experience (xp) in every skill from OSRS
+# - [ ] Run k-means clustering on xp and plot the results. 
+# - [ ] Correlate size of the points in the cluster with the number of elements in the cluster. 
+# - [ ]  Or rather, points that are far from cluster centers are larger. This will help to detect unique accounts.
 
 
 import pandas as pd

@@ -3,6 +3,7 @@
 import math
 import requests
 import pandas as pd
+import random
 
 
 base_url = "https://secure.runescape.com/m=hiscore_oldschool/overall"
@@ -77,6 +78,7 @@ def get_page_as_df(skill, page_number):
         df = df_list[0]
         df.index += 1 # 1 index instead of 0 to match higscore indexing
         df.columns = ['Rank', 'Name', 'Level', 'XP']
+        df['Page'] = page_number
         #print(df)
         #print(df.dtypes)
         return df
@@ -87,4 +89,12 @@ def get_page_as_df(skill, page_number):
 
 
 
+def create_sample_list(samples_to_take):
+    ''' returns a list of random samples
 
+    This returned list can be iterated over to provide random and unique samples
+    '''
+    #samples_to_take = 80_000 # There are 80_000 pages to query per skill
+    
+    samples = random.sample(range(1,samples_to_take+1), samples_to_take)
+    return samples
