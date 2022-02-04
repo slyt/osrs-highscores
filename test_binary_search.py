@@ -1,4 +1,4 @@
 import helpers
 
-skill = 'Strength'
+skill = 'construction'
 helpers.binary_search(skill=skill)

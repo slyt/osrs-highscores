@@ -102,47 +102,55 @@ def create_sample_list(samples_to_take, population_size):
 
 def binary_search(skill):
     # Get page 80_000 to determine minimum level
-    current_page = 80_000
-    df = get_page_as_df(skill=skill, page_number=current_page)
-    print(pd.Series(df['Level']))
-    unique = pd.Series(df['Level']).unique() # Page contains all the same level
+    start_page = 80_000 # TODO: Allow function to find arbetrary level pages
+    max_page_level = 0
+    df = get_page_as_df(skill=skill, page_number=start_page)
     start_level = df.at[25, 'Level']
-    current_level = start_level
     start_xp = df.at[25, 'XP']
+    print('start_page={} start_level={} start_xp={}'.format(start_page, start_level, start_xp))
 
-    print('current_page={} unique={} start_level={} start_xp={}'.format(current_page, unique, start_level, start_xp))
-    print(df)
-    
-    # Initial condition, always decrease
-    delta = int(round(current_page/2))
-    current_page = current_page - delta
+    current_level=start_level
+    current_page = start_page
+    max_page_level = current_level
+    unique = pd.Series(df['Level']).unique() # Page contains all the same level
 
-    iteration = 0
-    while len(unique) == 1: # While all levels on the page are the same
-        print("Checking page {}".format(current_page))
-        df = get_page_as_df(skill=skill, page_number=current_page)
-        unique = pd.Series(df['Level']).unique() # Page contains all the same level
-        if len(unique) != 1: # Termination condition
-            break
-        page_level = df.at[25, 'Level']
-        delta=int(round(delta/2)) # Update delta
-        if delta == 0: delta=1 # Just in case we ever round down to 0, we still want to progress
-        print("iteration={} current_page={} delta={} page_level={} unique={}".format(iteration, current_page, delta, page_level, unique))
+
+    while max_page_level < 99:
+        #df = get_page_as_df(skill=skill, page_number=current_page)
+        #print(pd.Series(df['Level']))
         
-
-        if page_level > current_level: # Increase
-            current_page = current_page + delta
-        else: # Decrease
-            current_page = current_page - delta
-        sleep_duration = random.uniform(1, 3) # Sleep for slightly random amount of time
-        print("... now sleeping for {}".format(sleep_duration))
-        time.sleep(sleep_duration) # Throttle requests to API (should probably do randomly)
-        iteration+=1
-    
-    page_url = request_page(skill=skill, page=current_page)
-    print('Level change {} on page {}: {}'.format(unique, current_page, page_url))
-
         
+        # Initial condition, always decrease
+        delta = int(round(current_page/2))
+        current_page = current_page - delta
+
+        iteration = 0
+        while len(unique) == 1: # While all levels on the page are the same
+            #print("Checking page {}".format(current_page))
+            df = get_page_as_df(skill=skill, page_number=current_page)
+            unique = pd.Series(df['Level']).unique() # Page contains all the same level
+            if len(unique) != 1: # Termination condition
+                break
+            page_level = df.at[25, 'Level']
+            delta=int(round(delta/2)) # Update delta
+            if delta == 0: delta=1 # Just in case we ever round down to 0, we still want to progress
+            print("iteration={} current_page={} delta={} page_level={} unique={}".format(iteration, current_page, delta, page_level, unique))
+            
+
+            if page_level > current_level: # Increase
+                current_page = current_page + delta
+            else: # Decrease
+                current_page = current_page - delta
+            sleep_duration = random.uniform(1, 3) # Sleep for slightly random amount of time
+            #print("... now sleeping for {}".format(sleep_duration))
+            time.sleep(sleep_duration) # Throttle requests to API (should probably do randomly)
+            iteration+=1
+        
+        page_url = request_page(skill=skill, page=current_page)
+        max_page_level = max(unique)
+        current_level = max_page_level # Now looking for the next level
+        unique=[max_page_level] # Make sure algo doesn't skip inner loop on next iteration of outer loop
+        print('Level change {} max_page_level {} on page {}: {}'.format(unique, max_page_level, current_page, page_url))
 
         
 
