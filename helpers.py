@@ -5,6 +5,8 @@ import requests
 import pandas as pd
 import random
 import time
+import matplotlib.pyplot as plt
+import os # Used to make directories
 
 
 base_url = "https://secure.runescape.com/m=hiscore_oldschool/overall"
@@ -35,6 +37,134 @@ default_skills = {
     "hunter":22,
     "construction":23,
 }
+
+xp_level_table = [0,  # lvl 1
+                  83,  # lvl 2
+                  174,
+                  276,
+                  388,
+                  512,
+                  650,
+                  801,
+                  969,
+                  1154,
+                  1358,
+                  1584,
+                  1833,
+                  2107,
+                  2411,
+                  2746,
+                  3115,
+                  3523,
+                  3973,
+                  4470,
+                  5018,
+                  5624,
+                  6291,
+                  7028,
+                  7842,
+                  8740,
+                  9730,
+                  10824,
+                  12031,
+                  13363,
+                  14833,
+                  16456,
+                  18247,
+                  20224,
+                  22406,
+                  24815,
+                  27473,
+                  30408,
+                  33648,
+                  37224,
+                  41171,
+                  45529,
+                  50339,
+                  55649,
+                  61512,
+                  67983,
+                  75127,
+                  83014,
+                  91721,
+                  101333,
+                  111945,
+                  123660,
+                  136594,
+                  150872,
+                  166636,
+                  184040,
+                  203254,
+                  224466,
+                  247886,
+                  273742,
+                  302288,
+                  333804,
+                  368599,
+                  407015,
+                  449428,
+                  496254,
+                  547953,
+                  605032,
+                  668051,
+                  737627,
+                  814445,
+                  899257,
+                  992895,
+                  1096278,
+                  1210421,
+                  1336443,
+                  1475581,
+                  1629200,
+                  1798808,
+                  1986068,
+                  2192818,
+                  2421087,
+                  2673114,
+                  2951373,
+                  3258594,
+                  3597792,
+                  3972294,
+                  4385776,
+                  4842295,
+                  5346332,
+                  5902831,
+                  6517253,
+                  7195629,
+                  7944614,
+                  8771558,
+                  9684577,
+                  10692629,
+                  11805606,
+                  13034431,  # lvl 99
+                  14391160,  # lvl 100 (virtual level)
+                  15889109,
+                  17542976,
+                  19368992,
+                  21385073,
+                  23611006,
+                  26068632,
+                  28782069,
+                  31777943,
+                  35085654,
+                  38737661,
+                  42769801,
+                  47221641,
+                  52136869,
+                  57563718,
+                  63555443,
+                  70170840,
+                  77474828,
+                  85539082,
+                  94442737,
+                  104273167,
+                  115126838,
+                  127110260,
+                  140341028,
+                  154948977,
+                  171077457,
+                  188884740,  # level 126 (virtual level)
+                  200000000]  # max XP
 
 def request_page(skill='overall', page=1):
 
@@ -100,11 +230,21 @@ def create_sample_list(samples_to_take, population_size):
     samples = random.sample(range(1,population_size+1), samples_to_take)
     return samples
 
+
+
 def binary_search(skill):
     # Get page 80_000 to determine minimum level
     start_page = 80_000 # TODO: Allow function to find arbetrary level pages
     max_page_level = 0
     df = get_page_as_df(skill=skill, page_number=start_page)
+
+    # Save df so that another thread can plot in real time
+    path = 'data/' + str(skill) + '/' # create directory if it doesn't exist
+    if not os.path.exists(path):
+        os.makedirs(path)
+        print("Created directory: ", path)
+    df.to_csv(path + skill + '.csv', mode='a', index=False)
+
     start_level = df.at[25, 'Level']
     start_xp = df.at[25, 'XP']
     print('start_page={} start_level={} start_xp={}'.format(start_page, start_level, start_xp))
@@ -114,6 +254,8 @@ def binary_search(skill):
     max_page_level = current_level
     unique = pd.Series(df['Level']).unique() # Page contains all the same level
 
+    # to run GUI event loop
+    plt.ion()
 
     while max_page_level < 99:
         #df = get_page_as_df(skill=skill, page_number=current_page)
@@ -126,15 +268,16 @@ def binary_search(skill):
 
         iteration = 0
         while len(unique) == 1: # While all levels on the page are the same
-            #print("Checking page {}".format(current_page))
+            print("Checking page {} ({})".format(current_page, skill))
             df = get_page_as_df(skill=skill, page_number=current_page)
+            df.to_csv(path + skill + '.csv', mode='a', index=False, header=False)
             unique = pd.Series(df['Level']).unique() # Page contains all the same level
             if len(unique) != 1: # Termination condition
                 break
             page_level = df.at[25, 'Level']
             delta=int(round(delta/2)) # Update delta
             if delta == 0: delta=1 # Just in case we ever round down to 0, we still want to progress
-            print("iteration={} current_page={} delta={} page_level={} unique={}".format(iteration, current_page, delta, page_level, unique))
+            print("skill={} iteration={} current_page={} delta={} page_level={} unique={}".format(skill, iteration, current_page, delta, page_level, unique))
             
 
             if page_level > current_level: # Increase
@@ -150,7 +293,7 @@ def binary_search(skill):
         max_page_level = max(unique)
         current_level = max_page_level # Now looking for the next level
         unique=[max_page_level] # Make sure algo doesn't skip inner loop on next iteration of outer loop
-        print('Level change {} max_page_level {} on page {}: {}'.format(unique, max_page_level, current_page, page_url))
+        print('skill={} Level change {} max_page_level {} on page {}: {}'.format(skill, unique, max_page_level, current_page, page_url))
 
         
 
