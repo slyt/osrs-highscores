@@ -1,6 +1,8 @@
 # helper functions
 
 import math
+from multiprocessing.sharedctypes import Value
+from turtle import back
 import requests
 import pandas as pd
 import random
@@ -201,21 +203,30 @@ def rank_to_page_number(rank):
     return page_number
 
 def get_page_as_df(skill, page_number):
-    request_url = request_page(skill=skill, page=page_number)
-    response = requests.get(request_url)
-    if response:
-        #print(response.text)
-        df_list = pd.read_html(response.text, skiprows={0,0}) # For some reason row 0 was all NA, so need to skip
-        df = df_list[0]
-        df.index += 1 # 1 index instead of 0 to match higscore indexing
-        df.columns = ['Rank', 'Name', 'Level', 'XP']
-        df['Page'] = page_number
-        #print(df)
-        #print(df.dtypes)
-        return df
 
-    else:
-        print('Error: response status code {} for url {}'.format(response.status_code, request_url))
+    success = False
+    backoff_multiplier = 1
+
+    while not success:
+        request_url = request_page(skill=skill, page=page_number)
+        response = requests.get(request_url)
+        if response:
+            #print(response.text)
+            try:
+                df_list = pd.read_html(response.text, skiprows={0,0}) # For some reason row 0 was all NA, so need to skip
+                df = df_list[0]
+                df.index += 1 # 1 index instead of 0 to match higscore indexing
+                df.columns = ['Rank', 'Name', 'Level', 'XP']
+                df['Page'] = page_number
+                #print(df)
+                #print(df.dtypes)
+                return df
+            except ValueError: # Throttle if getting temp banned
+                print("Temporarily banned, backing off: {} minute(s)".format(backoff_multiplier))
+                time.sleep(60 * backoff_multiplier)
+                backoff_multiplier = backoff_multiplier * 2
+        else:
+            print('Error: response status code {} for url {}'.format(response.status_code, request_url))
 
 
 
@@ -239,7 +250,7 @@ def binary_search(skill):
     df = get_page_as_df(skill=skill, page_number=start_page)
 
     # Save df so that another thread can plot in real time
-    path = 'data/' + str(skill) + '/' # create directory if it doesn't exist
+    path = 'data/' # create directory if it doesn't exist
     if not os.path.exists(path):
         os.makedirs(path)
         print("Created directory: ", path)
@@ -284,7 +295,7 @@ def binary_search(skill):
                 current_page = current_page + delta
             else: # Decrease
                 current_page = current_page - delta
-            sleep_duration = random.uniform(1, 3) # Sleep for slightly random amount of time
+            sleep_duration = random.uniform(1, 24) # Sleep for slightly random amount of time
             #print("... now sleeping for {}".format(sleep_duration))
             time.sleep(sleep_duration) # Throttle requests to API (should probably do randomly)
             iteration+=1
