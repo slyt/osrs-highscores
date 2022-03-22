@@ -2,7 +2,7 @@
 
 This is a hobby data analytics project based on the Old School Runescape (OSRS) highscores.
 
-It leverages the [osrs-highscores](https://pypi.org/project/osrs-highscores/) python package. Not to be confused with the [OSRS-Highscores](https://pypi.org/project/OSRS-Hiscores/) package which is not as fully features.
+
 
 
 ## How to setup environment
@@ -116,9 +116,75 @@ Non-skill highscores are stored where `category_type=1`. For example, Clue Scrol
 | 58 | Zalcano                          |
 | 59 | Zulrah                           |
 
+## API Parsing
+
+It is possible to scrape the Old School Runescape highscores by parsing the HTML into a Pandas dataframe with:
+```Python
+import requests
+import pandas as pd
+
+base_url = "https://secure.runescape.com/m=hiscore_oldschool/overall"
+skill_index = 1 # 1 = Attack
+page = 1        # 1 = Frontpage
+
+request_url = base_url + '?table=' + str(skill_index) + '&' + 'page=' + str(page)
+response = requests.get(request_url)
+
+df_list = pd.read_html(response.text, skiprows={0,0}) # For some reason row 0 was all NA, so need to skip
+df = df_list[0]
+df.index += 1 # 1 index instead of 0 to match highscore indexing
+df.columns = ['Rank', 'Name', 'Level', 'XP']
+print(df)
+```
+
+Output:
+```
+    Rank          Name  Level         XP
+1      1          Heur     99  200000000
+2      2    Unohdettu2     99  200000000
+3      3        Drakon     99  200000000
+4      4   Ame Umehara     99  200000000
+5      5         Jakee     99  200000000
+6      6       Ursadon     99  200000000
+7      7        Howson     99  200000000
+8      8      Dr PFAFF     99  200000000
+9      9  Malt Lickeys     99  200000000
+10    10        Burned     99  200000000
+11    11    Blue Limes     99  200000000
+12    12  Mini Finbarr     99  200000000
+13    13    Unohdettu3     99  200000000
+14    14      Eslihero     99  200000000
+15    15    Lynx Titan     99  200000000
+16    16  AndrewWigins     99  200000000
+17    17        iMelee     99  200000000
+18    18    Portuguese     99  200000000
+19    19     MarkoOSRS     99  200000000
+20    20         Cairo     99  200000000
+21    21      Hey Jase     99  200000000
+22    22       H D M P     99  200000000
+23    23        Yumemi     99  200000000
+24    24        Fiiggy     99  200000000
+25    25   Edgecrusher     99  200000000
+```
+
+A JSON API exists, but unfortunately the it only shows up to the top 50 players and does not appear to support pageination:
+
+- Front page of attack: `https://secure.runescape.com/m=hiscore_oldschool/ranking.json?m=&table=1&category=0&size=25`
+- Top 50 players for attack: `https://secure.runescape.com/m=hiscore_oldschool/ranking.json?m=&table=1&category=0&size=25`
+- Accessing a specific page does not work: `https://secure.runescape.com/m=hiscore_oldschool/ranking.json?m=&table=1&category=0&size=25&page=999`
+
+So in order to scrape the entire OSRS highscores, we are left witih the only option: parse HTML, 25 entries at a time.
+
 ## Runtime analysis
 For a single skill, if we request one page (25 skills) per second, it will take 80,000 seconds ~= 1,333.33 minutes ~= 22.22 hours ~= 0.92 days.
 
 So for 23 skills + overall highscores, it will take about 24 days ~= almost a month to scrape the entire skills highscores.
 
-This can be sped up via making parallel requests and increasing the request speed. Also, instead of scraping the entire population of 2 Million, we can randomly sample a subset of the population.
+This can be sped up via making parallel requests thus increasing the request speed. 
+
+Also, instead of scraping the entire population of 2 Million, we can randomly sample a subset of the population. We can also search for "points of interest" within the dataset, for example, try to find the pages where levels transition and extrapolate between them.
+
+## See Also
+- OSRS API reference from Wiki: https://runescape.wiki/w/Application_programming_interface
+- OSRS API reference for Google Sheets: https://sites.google.com/view/runescapeassistsheets/runescape-api
+- [osrs-highscores](https://pypi.org/project/osrs-highscores/) python package (_Note: This library was lacking in that it could only access data per user, not per page of a skill_). Not to be confused with the [OSRS-Highscores](https://pypi.org/project/OSRS-Hiscores/) package which is not as fully features.
