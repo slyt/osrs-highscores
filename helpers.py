@@ -215,7 +215,7 @@ def get_page_as_df(skill, page_number):
             try:
                 df_list = pd.read_html(response.text, skiprows={0,0}) # For some reason row 0 was all NA, so need to skip
                 df = df_list[0]
-                df.index += 1 # 1 index instead of 0 to match higscore indexing
+                df.index += 1 # 1 index instead of 0 to match highscore indexing
                 df.columns = ['Rank', 'Name', 'Level', 'XP']
                 df['Page'] = page_number
                 #print(df)
@@ -241,13 +241,28 @@ def create_sample_list(samples_to_take, population_size):
     samples = random.sample(range(1,population_size+1), samples_to_take)
     return samples
 
+def get_page_as_df_from_json(skill, page_number):
+    success = False
+    
+
+def binary_search(skill, level=None):
 
 
-def binary_search(skill):
+    # set random start delay so we don't flood with requests initially
+    sleep_duration = random.uniform(1, 120) # Sleep for slightly random amount of time
+    time.sleep(sleep_duration) # Throttle requests to API (should probably do randomly)
+
     # Get page 80_000 to determine minimum level
     start_page = 80_000 # TODO: Allow function to find arbetrary level pages
     max_page_level = 0
-    df = get_page_as_df(skill=skill, page_number=start_page)
+    df = get_page_as_df(skill=skill, page_number=start_page) # columns = ['Rank', 'Name', 'Level', 'XP']
+
+    print(df)
+    # Get the minimum level for the skill to appear on the highscores
+    minimum_level = df.at[25, 'Level']
+    print(f'minimum_level: {minimum_level}')
+    return # TODO: Remove
+
 
     # Save df so that another thread can plot in real time
     path = 'data/' # create directory if it doesn't exist

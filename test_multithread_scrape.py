@@ -14,7 +14,6 @@ if __name__ == "__main__":
     for skill in skill_list:
         thread_list.append(threading.Thread(target=helpers.binary_search, name=skill, args=(skill,)))
 
-  
     # starting threads
     for thread in thread_list:
         thread.start()
