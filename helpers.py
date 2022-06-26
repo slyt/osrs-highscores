@@ -240,9 +240,6 @@ def create_sample_list(samples_to_take, population_size):
     
     samples = random.sample(range(1,population_size+1), samples_to_take)
     return samples
-
-def get_page_as_df_from_json(skill, page_number):
-    success = False
     
 
 def binary_search(skill, level=None):
